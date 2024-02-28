@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./e-Paper/RaspberryPi_JetsonNano/python/lib"
+    ]
+}
