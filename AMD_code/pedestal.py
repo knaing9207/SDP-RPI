@@ -14,12 +14,6 @@ frequency = 50  # Hz
 GPIO.setup(pwm_pin, GPIO.OUT)
 pwm = GPIO.PWM(pwm_pin, frequency)
 
-2.5
-5
-7.5
-10
-12.5
-
 try:
     # Start PWM with duty cycle for 0 degrees
     pwm.start(7.5)
