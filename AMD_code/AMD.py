@@ -3,8 +3,12 @@ import time
 import serial
 from OCR_Text_Extraction import imageocr
 
+# Define the serial port
+arduino_port = '/dev/ttyACM0'  # Change this to match your Arduino port
+arduino_baudrate = 9600  # Make sure this matches the baud rate in your Arduino code
 
-ser = serial.Serial('/dev/ttyACM0', 9600)  # Use the correct serial port
+# Initialize serial communication with the Arduino
+arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 #def buttons(str1,str2,str3,str4,str5,str6,str7,str8):
 # Set up GPIO mode and pins
@@ -33,7 +37,7 @@ while Run:
     
     if GPIO.input(button1) == GPIO.LOW:
         print("Button 1 pressed!")
-        ser.write(b'1')  # Send command to Arduino
+        arduino.write(b'1')  # Send command to Arduino
         time.sleep(0.2)  # Add a small delay to debounce
         while GPIO.input(button1) == GPIO.LOW:
             time.sleep(0.2)
@@ -41,7 +45,7 @@ while Run:
 
     if GPIO.input(button2) == GPIO.LOW:
         print("Button 2 pressed!")
-        ser.write(b'2')  # Send command to Arduino
+        arduino.write(b'2')  # Send command to Arduino
         time.sleep(0.2)  # Add a small delay to debounce
         while GPIO.input(button2) == GPIO.LOW:
             time.sleep(0.2)

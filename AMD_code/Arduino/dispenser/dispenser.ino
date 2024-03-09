@@ -7,13 +7,13 @@ int photoPin1 = A0;
 bool state1;
 
 void setup() {
+  Serial.begin(9600);
   start(8, servo1);
   delay(1000);
 }
 
 void loop() {
   
-    // Additional setup code for your e-paper display
     if (Serial.available() > 0) {
       
         char command = Serial.read();
