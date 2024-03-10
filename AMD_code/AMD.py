@@ -14,7 +14,7 @@ arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 # Set up GPIO mode and pins
 button1 = 0 #27 
 button2 = 1 #28
-button3 = 22 #15
+button3 = 22 #15 0,1,22,23,5,6,16,26
 button4 = 23 #16
 button5 = 5 #29
 button6 = 6 #31

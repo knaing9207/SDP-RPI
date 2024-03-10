@@ -1,4 +1,13 @@
+import RPi.GPIO as GPIO
 import time
+import serial
+
+# Define the serial port
+arduino_port = '/dev/ttyACM0'  # Change this to match your Arduino port
+arduino_baudrate = 9600  # Make sure this matches the baud rate in your Arduino code
+
+# Initialize serial communication with the Arduino
+arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 def get_time():
    """
@@ -9,8 +18,13 @@ def get_time():
 def check_time(check_time):
    current_time = get_time()
    if current_time == check_time:
-      print("Time to wake up!")
+      arduino.write(b'1')  # Send command to Arduino
       
+
+first = "14:26"
+
+check_time(first)
+
 while True:
-   check_time("13:51") 
+   check_time(first) 
    time.sleep(60)

@@ -6,6 +6,24 @@ from PyQt5.QtCore import Qt, QTimer
 import RPi.GPIO as GPIO
 import pyttsx3
 
+button1 = 0 #27 
+button2 = 1 #28
+button3 = 22 #15 0,1,22,23,5,6,16,26
+button4 = 23 #16
+button5 = 5 #29
+button6 = 6 #31
+button7 = 16 #36
+button8 = 26 #37
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(button1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button3, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button4, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button5, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button6, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button7, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button8, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 class MedicationDispenser(QWidget):
     def __init__(self):
@@ -36,7 +54,7 @@ class MedicationDispenser(QWidget):
         self.buttons = []
         for i in range(8):
             button = QPushButton()
-            button.setStyleSheet("font-size: 22px; padding: 20px; background-color: #f0f0f0; color: black;")
+            button.setStyleSheet("font-size: 60px; padding: 0px; background-color: #f0f0f0; color: black;")
             button.clicked.connect(lambda _, b=i: self.buttonClicked(b))
             self.buttons.append(button)
             if i < 4:
@@ -55,11 +73,11 @@ class MedicationDispenser(QWidget):
 
     def setupGPIO(self):
         """Configures the GPIO pins for the Raspberry Pi."""
-        GPIO.setmode(GPIO.BOARD)
-        self.button_pins = [11, 13, 15, 16, 18, 22, 29, 31]
-        self.tts_button_pin = 33
-        for pin in self.button_pins + [self.tts_button_pin]:
-            GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # GPIO.setmode(GPIO.BOARD)
+        # self.button_pins = [0,1,22,23,5,6,16,26]
+        # self.tts_button_pin = 33
+        # for pin in self.button_pins:
+        #     GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
         self.timer = QTimer()
         self.timer.timeout.connect(self.checkButtonPresses)
@@ -111,10 +129,10 @@ class MedicationDispenser(QWidget):
 
     def checkButtonPresses(self):
         """Checks for physical button presses and triggers corresponding UI actions."""
-        for i, pin in enumerate(self.button_pins):
-            if GPIO.input(pin) == GPIO.LOW:
-                self.buttonClicked(i)  # Simulate clicking the corresponding UI button
-                time.sleep(0.2)  # Debounce delay
+        # for i, pin in enumerate(self.button_pins):
+        #     if GPIO.input(pin) == GPIO.LOW:
+        #         self.buttonClicked(i)  # Simulate clicking the corresponding UI button
+        #         time.sleep(0.2)  # Debounce delay
 
     def readOptionsAloud(self):
         """Uses Text-to-Speech to read out options for the current screen."""
