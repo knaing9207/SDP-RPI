@@ -61,20 +61,20 @@ def imageocr():
             list2.append(look)
         return list2
 
-    def get_dosage(strh,ID):
-        sen = strh.split(" ")
-        index = sen.index(ID)
-        if len(sen[index])>2:
-            value = ""
-            num1 = 0
-            for wrdh in sen:
-                if ID in wrdh:
-                    value = sen[num1] + ID
-                num1 = num1 +1
-        elif len(sen[index]) == 2:
-            value = sen[index-1]   
+    # def get_dosage(strh,ID):
+    #     sen = strh.split(" ")
+    #     index = sen.index(ID)
+    #     if len(sen[index])>2:
+    #         value = ""
+    #         num1 = 0
+    #         for wrdh in sen:
+    #             if ID in wrdh:
+    #                 value = sen[num1] + ID
+    #             num1 = num1 +1
+    #     elif len(sen[index]) == 2:
+    #         value = sen[index-1]   
 
-        return value
+    #     return value
 
     def get_quantity(strh):
         #value = ""
@@ -128,12 +128,12 @@ def imageocr():
             quantity = get_quantity(item)
             print(f" Quantity: {quantity}")
             
-        elif "MG" in item:
-            dosage = get_dosage(item,"MG")
-            print(f"Dosage: {dosage} MG Tablets ")
-        elif "MCG" in item:
-            dosage =get_dosage(item,"MCG")
-            print(f"Dosage: {dosage} MCG Tablets")
+        # elif "MG" in item:
+        #     dosage = get_dosage(item,"MG")
+        #     print(f"Dosage: {dosage} MG Tablets ")
+        # elif "MCG" in item:
+        #     dosage =get_dosage(item,"MCG")
+        #     print(f"Dosage: {dosage} MCG Tablets")
         elif "/" in item:
             duration = item
             print(f"Duration: {duration}")

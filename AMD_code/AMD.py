@@ -2,6 +2,7 @@ import RPi.GPIO as GPIO
 import time
 import serial
 from OCR_Text_Extraction import imageocr
+import os
 
 # Define the serial port
 arduino_port = '/dev/ttyACM0'  # Change this to match your Arduino port
@@ -33,6 +34,7 @@ GPIO.setup(button8, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 
 Run = True
+print("ready")
 while Run:
     
     if GPIO.input(button1) == GPIO.LOW:
@@ -45,7 +47,17 @@ while Run:
 
     if GPIO.input(button2) == GPIO.LOW:
         print("Button 2 pressed!")
-        arduino.write(b'2')  # Send command to Arduino
+        fswebcam = 'fswebcam --resolution 1920x1080 --save /home/team31/project/AMD_code/image2.jpg'
+        os.system(fswebcam)
+        arduino.write(b'1')  # Send command to Arduino
+        time.sleep(2.5)
+        fswebcam = 'fswebcam --resolution 1920x1080 --save /home/team31/project/AMD_code/image3.jpg'
+        os.system(fswebcam)
+        arduino.write(b'2')
+        time.sleep(2.5)
+        fswebcam = 'fswebcam --resolution 1920x1080 --save /home/team31/project/AMD_code/image1.jpg'
+        os.system(fswebcam)
+        arduino.write(b'3')
         time.sleep(0.2)  # Add a small delay to debounce
         while GPIO.input(button2) == GPIO.LOW:
             time.sleep(0.2)

@@ -41,7 +41,7 @@ void dispenseAndDetect(Servo &servo, int &angle, bool &state, int photoPin) {
       delay(10);
       // Check light level during dispensing
       int light = analogRead(photoPin);
-      if (light < 90) {
+      if (light < 80) {
         state = true;
         break;
       }
@@ -57,7 +57,7 @@ void dispenseAndDetect(Servo &servo, int &angle, bool &state, int photoPin) {
       delay(15);
       // Check light level during dispensing
       int light = analogRead(photoPin);
-      if (light < 90) {
+      if (light < 80) {
         state = true;
         break;
       }

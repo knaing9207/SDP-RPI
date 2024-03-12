@@ -2,17 +2,20 @@ import sys
 import os
 import time
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QInputDialog
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import Qt, QTimer
 import RPi.GPIO as GPIO
 import pyttsx3
 
 class MedicationDispenser(QWidget):
-    
+
     # Define the options available in each screen
     options = {
-            "main_menu": ["Add Pill", "Medicine Info", "Set Reminder", "Check Schedule", "Emergency", "Settings", "Help", ""],
-            "Add Pill": ["OCR","","","Back"],
-            "Settings": ["Change Name", "Volume Control", "Screen Brightness", "Back"],
+            "main_menu": ["Add Med.", "Med. Info", "Reminder", "Schedule", "Settings", None, None, None],
+            "Add Medication": ["OCR", None, None, "Back"],
+            "Medication Info": [None, None, None, "Back", None, None, None, None],
+            "Set Reminder": [None, None, None, "Back", None, None, None, None],
+            "Check Schedule": [None, None, None, "Back", None, None, None, None],
+            "Settings": [None, "Volume Control", "Screen Brightness", "Back", None, None, None, None],
             # Add additional options for each submenu here...
     }
 
@@ -20,31 +23,26 @@ class MedicationDispenser(QWidget):
         super().__init__()
         self.setWindowTitle('Medication Dispenser')
         self.setGeometry(0, 0, 800, 480)  # Geometry for a 5-inch DSI display
-        self.userName = self.loadUserName()  # Load or ask for the user name
         self.current_screen = "main_menu"
         self.setupUI()
         self.setupGPIO()
         self.tts_engine = pyttsx3.init()
 
-    def loadUserName(self):
-        """Loads the user's name from a file, or prompts for it if not found."""
-        try:
-            with open("username.txt", "r") as file:
-                return file.read().strip()
-        except FileNotFoundError:
-            name, ok = QInputDialog.getText(self, "User Name", "Enter your name:")
-            if ok and name:
-                with open("username.txt", "w") as file:
-                    file.write(name)
-                return name
-            return "User"  # Default name if none provided
+    def update_time(self):
+        time_str = time.strftime("%I:%M %p")
+        self.time_label.setText(time_str)
+        self.time_label.setAlignment(Qt.AlignCenter)
 
     def setupUI(self):
         """Initializes the user interface components."""
         self.layout = QVBoxLayout()
-        self.label = QLabel(f"Hello, {self.userName}!")
+        self.label = QLabel()
         self.label.setStyleSheet("font-size: 30px; font-weight: bold; color: black; margin-bottom: 20px;")
         self.layout.addWidget(self.label)
+
+        self.time_label = QLabel()
+        self.time_label.setStyleSheet("font-size: 30px; font-weight: bold;")
+        self.layout.addWidget(self.time_label)
 
         # Layouts for button arrangement
         centralLayout = QHBoxLayout()
@@ -57,7 +55,7 @@ class MedicationDispenser(QWidget):
         for i in range(8):
             button = QPushButton()
             button.setStyleSheet(buttonStyle)
-            button.setFixedSize(300, 80)  # Ensuring buttons are not oversized
+            button.setFixedSize(300, 90)  # Ensuring buttons are not oversized
             button.clicked.connect(lambda _, b=i: self.buttonClicked(b))
             self.buttons.append(button)
             if i < 4:
@@ -85,6 +83,7 @@ class MedicationDispenser(QWidget):
         # Timer to periodically check button presses
         self.timer = QTimer()
         self.timer.timeout.connect(self.checkButtonPresses)
+        self.timer.timeout.connect(self.update_time)
         self.timer.start(100)
 
     def updateScreen(self, screen):
@@ -102,9 +101,7 @@ class MedicationDispenser(QWidget):
     def buttonClicked(self, button_index):
         """Handles button click events for navigation and actions."""
         selected_option = self.buttons[button_index].text()
-        if selected_option == "Change Name" and self.current_screen == "Settings":
-            self.changeUserName()
-        elif selected_option == "Back":
+        if selected_option == "Back":
             self.updateScreen("main_menu")
         else:
             # For main menu options, navigate to the corresponding screen
@@ -113,15 +110,6 @@ class MedicationDispenser(QWidget):
             else:
                 # Placeholder for implementing specific functionality
                 print(f"{selected_option} selected in {self.current_screen}")
-
-    def changeUserName(self):
-        """Allows the user to change their name via a dialog."""
-        newName, ok = QInputDialog.getText(self, "Change Name", "Enter your new name:")
-        if ok and newName:
-            self.userName = newName
-            with open("username.txt", "w") as file:
-                file.write(newName)
-            self.label.setText(f"Hello, {self.userName}!")  # Update greeting
 
     def checkButtonPresses(self):
         """Checks GPIO pins for button presses and triggers corresponding UI actions."""
