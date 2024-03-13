@@ -16,10 +16,7 @@ class MainWindow(QMainWindow):
             "Delete Med": "screen_2",
             "Med Info": "screen_3",
             "Sound": "screen_4",
-            "7": "screen_5",
-            "8": "screen_6",
-            "10": "screen_3",  # Added mapping for button 10 to screen_3
-            "Back": "main_menu"  # Added mapping for the "Back" button to return to main menu
+            "Home": "main_menu"  # Added mapping for the "Back" button to return to main menu
             # Add mappings for other buttons here...
         }
 
@@ -79,11 +76,11 @@ class MainWindow(QMainWindow):
         if screen == "main_menu":
             return ["Add Med", "Med Info", None, None, None, None, "Delete Med", "Sound"]
         elif screen == "screen_1":
-            return ["9", "10", None, None, "13", "14", "15", "Back"]
+            return ["1", None, None, None, None, None, "Home", "Ok"]
         elif screen == "screen_2":
-            return ["17", "18", None, None, "21", "22", "23", "Back"]
+            return ["1", None, None, None, None, None, "Home", "ok"]
         elif screen == "screen_3":
-            return ["25", "26", None, None, "29", "30", "31", "Back"]
+            return ["1", None, None, None, None, None, "Home", None]
         # Define button labels for other screens here...
         else:
             return ["These are the instructions for this page","Back"]  # Default to "Back" button for unknown screens

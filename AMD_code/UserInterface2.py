@@ -50,7 +50,7 @@ class MedicationDispenser(QWidget):
         rightLayout = QVBoxLayout()
 
         # Style and size settings for the buttons
-        buttonStyle = "QPushButton { font-size: 22px; padding: 20px; background-color: #f0f0f0; color: black; margin: 5px; }"
+        buttonStyle = "QPushButton { font-size: 28px; padding: 30px; background-color: #f0f0f0; color: black; margin: 5px; }"
         self.buttons = []
         for i in range(8):
             button = QPushButton()

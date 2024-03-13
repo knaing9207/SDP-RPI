@@ -22,6 +22,8 @@ button6 = 6 #31
 button7 = 16 #36
 button8 = 26 #37
 
+
+
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(button1, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(button2, GPIO.IN, pull_up_down=GPIO.PUD_UP)
@@ -46,8 +48,11 @@ while Run:
         time.sleep(0.2)  
 
     if GPIO.input(button2) == GPIO.LOW:
+        LEDs = 25
+        GPIO.setup(LEDs, GPIO.OUT)
         print("Button 2 pressed!")
         fswebcam = 'fswebcam --resolution 1920x1080 --save /home/team31/project/AMD_code/image2.jpg'
+        GPIO.output(LEDs, GPIO.HIGH)
         os.system(fswebcam)
         arduino.write(b'1')  # Send command to Arduino
         time.sleep(2.5)
@@ -57,6 +62,9 @@ while Run:
         time.sleep(2.5)
         fswebcam = 'fswebcam --resolution 1920x1080 --save /home/team31/project/AMD_code/image1.jpg'
         os.system(fswebcam)
+        time.sleep(5)
+        GPIO.output(LEDs, GPIO.LOW)
+        GPIO.cleanup(LEDs)
         arduino.write(b'3')
         time.sleep(0.2)  # Add a small delay to debounce
         while GPIO.input(button2) == GPIO.LOW:
