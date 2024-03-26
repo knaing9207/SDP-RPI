@@ -1,6 +1,6 @@
 {
     "board": "arduino:avr:uno",
     "port": "/dev/ttyACM0",
-    "programmer": "avrispmkii",
-    "sketch": "AMD_code/Arduino/dispenser/dispenser.ino"
+    "sketch": "AMD_code/Arduino/AMD/AMD.ino",
+    "programmer": "avrispmkii"
 }

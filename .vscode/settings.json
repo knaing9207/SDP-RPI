@@ -1,5 +1,6 @@
 {
     "python.analysis.extraPaths": [
-        "./e-Paper/RaspberryPi_JetsonNano/python/lib"
+        "./e-Paper/RaspberryPi_JetsonNano/python/lib",
+        "./AMD_code"
     ]
 }
