@@ -1,35 +1,36 @@
 import re
-from paddleocr import PaddleOCR
 import os
 import RPi.GPIO as GPIO
 import time
 import pandas as pd
-# from thefuzz import process
+from paddleocr import PaddleOCR
+from thefuzz import process
 
+def NDC(data, dosage, unit,med):
+    # Change directory
+    os.chdir(r"/home/team31/project/AMD_code/ndcxls")
 
-# def NDC(data, dosage, unit):
-#     # Change directory
-#     os.chdir(r"/home/team31/project/AMD_code/ndcxls")
+    # Import the NDC dataset
+    filename = "filtered_product.csv"
+    dataset = pd.read_csv(filename)
 
-#     # Import the NDC dataset
-#     filename = "product.csv"
-#     dataset = pd.read_csv(filename)
+    threshold = 85
 
-#     threshold = 85
+    matched_list = []
 
-#     matched_list = []
+    for query in data:
+        extract = process.extractOne(query, dataset["PROPRIETARYNAME"], score_cutoff=threshold)
+        if extract is None:
+            pass
+        else:
+            if str.upper(dosage) in str.upper(dataset.iloc[extract[2]]["ACTIVE_NUMERATOR_STRENGTH"]):
+                if str.upper(unit) in str.upper(dataset.iloc[extract[2]]["ACTIVE_INGRED_UNIT"]):
+                    matched_list.append(extract[0])
+                    result = matched_list[0]
+                    med.name = result
 
-#     for query in data:
-#         extract = process.extractOne(query, dataset["PROPRIETARYNAME"], score_cutoff=threshold)
-#         if extract is None:
-#             pass
-#         else:
-#             if str.upper(dosage) in str.upper(dataset.iloc[extract[2]]["ACTIVE_NUMERATOR_STRENGTH"]):
-#                 if str.upper(unit) in str.upper(dataset.iloc[extract[2]]["ACTIVE_INGRED_UNIT"]):
-#                     matched_list.append(extract[0])
+                    return
     
-#     print(matched_list)
-
 def process_MGNDC(strings):
     for string in strings:
         if 'MG' in string:
@@ -67,18 +68,26 @@ def process_TABLET(strings,med):
 def process_QTY(strings,med):
     for string in strings:
         if 'QTY' in string:
-            matches_with_space = re.findall(r'QTY\s+(\d+)\s*([oO0]*)', string)
-            matches_without_space = re.findall(r'QTY(\d+)\s*([oO0]*)', string)
+            matches_with_space = re.findall(r'[QO0o]TY\s*[:;]?\s*(\d+)\s*([oO0]*)', string)
+            matches_without_space = re.findall(r'[QO0o]TY[:;]?\s*(\d+)\s*([oO0]*)', string)
             matches = matches_with_space or matches_without_space
             if matches:
                 number, zeros = matches[0]
                 zeros_count = len(zeros)
-                result = number + "0" * zeros_count 
+                result = number + "0" * zeros_count
                 med.qty = result
                 
                 return
-
-
+            
+def shortndc(input_array):
+    new_array = []
+    for item in input_array:
+        if ' ' in item:
+            split_items = item.split()  # Splitting the item based on spaces
+            new_array.extend(split_items)  # Adding split items to the new array
+        else:
+            new_array.append(item)  # Adding items without spaces directly to the new array
+    return new_array
 
 def imageocr(prescription):
     GPIO.setmode(GPIO.BCM)
@@ -87,7 +96,7 @@ def imageocr(prescription):
 
     GPIO.output(LEDs, GPIO.HIGH)
     time.sleep(2)
-    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Manual" --set "Focus (absolute)"=0 --crop 1000x1080+460+0 --save /home/team31/project/AMD_code/image.jpg'
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMD_code/image.jpg'
 
     os.system(fswebcam)
     
@@ -114,8 +123,4 @@ def imageocr(prescription):
     process_MG(data,prescription) 
     process_TABLET(data,prescription) 
     process_QTY(data,prescription)
-    # NDC(data, process_MGNDC(data), 'MG') 
-
-
-
-
+    NDC(shortndc(data), process_MGNDC(data), 'MG',prescription) 

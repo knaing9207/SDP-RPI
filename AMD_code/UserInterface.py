@@ -3,11 +3,11 @@ import sys
 import time
 import serial
 import RPi.GPIO as GPIO
-from OCR import imageocr
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QGridLayout, QLabel
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtCore import Qt,QTimer
 from functools import partial
+from OCR import imageocr
 
 # Define the serial port
 arduino_port = '/dev/ttyACM0'  # Change this to match your Arduino port
@@ -17,20 +17,25 @@ arduino_baudrate = 9600  # Make sure this matches the baud rate in your Arduino 
 arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 class MedicationInformation:
-    def __init__(self, name, dose, time, qty, expire):
+    def __init__(self, name, dose, time, qty, expire, timemin, timehour):
         self.name = name
         self.dose = dose
         self.time = time
         self.qty = qty
         self.expire = expire
+        self.timemin = timemin
+        self.timehour = timehour
 
     def __str__(self):
         return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n  Tablets Per Day:  {self.time}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}"
 
-prescription1 = MedicationInformation("Tylenol", "", "", "", "")
-prescription2 = MedicationInformation("", "", "", "", "")
-prescription3 = MedicationInformation("", "", "", "", "")
-prescription4 = MedicationInformation("", "", "", "", "")
+prescription1 = MedicationInformation("M1", "", "", "", "", "", "")
+prescription2 = MedicationInformation("M2", "", "", "", "", "", "")
+prescription3 = MedicationInformation("M3", "", "", "", "", "", "")
+prescription4 = MedicationInformation("M4", "", "", "", "", "", "")
+
+
+
 
 class MedicationDispenser(QMainWindow):
     def __init__(self):
@@ -38,7 +43,6 @@ class MedicationDispenser(QMainWindow):
 
         self.setWindowTitle("Medication Dispenser")
         self.setGeometry(0, 0, 800, 480)  # Set window dimensions
-
         self.setupGPIO()
         self.initUI()
 
@@ -120,7 +124,9 @@ class MedicationDispenser(QMainWindow):
             },
             "screen_10": {
                 0: "%s" % prescription1.name,
-                1: "Med 2",
+                1: "%s" % prescription2.name,
+                5: "%s" % prescription3.name,
+                6: "%s" % prescription4.name,
                 23: "Home"
             },
             "screen_11": {
@@ -138,6 +144,12 @@ class MedicationDispenser(QMainWindow):
                 23: "Home"
             },
             "screen_15": {
+                23: "Home"
+            },
+            "screen_16": {
+                23: "Home"
+            },
+            "screen_17": {
                 23: "Home"
             }
         }
@@ -188,7 +200,7 @@ class MedicationDispenser(QMainWindow):
                 """)
 
                 if label == "Add Med":  # Check if the label is "1"
-                    icon_path = os.path.join(os.path.dirname(__file__), "icon1.png")
+                    icon_path = os.path.join(os.path.dirname(__file__), "Plus.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)
@@ -199,28 +211,28 @@ class MedicationDispenser(QMainWindow):
                     button.clicked.connect(self.ocr_function)  # Connect button click to function
                     
                 if label == "Hour up":  # Check if the label is "1"
-                    icon_path = os.path.join(os.path.dirname(__file__), "up.png")
+                    icon_path = os.path.join(os.path.dirname(__file__), "Up.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)
                     button.setIcon(icon)
 
                 if label == "Hour down":  # Check if the label is "1"
-                    icon_path = os.path.join(os.path.dirname(__file__), "down.png")
+                    icon_path = os.path.join(os.path.dirname(__file__), "Down.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)
                     button.setIcon(icon)
 
                 if label == "Min up":  # Check if the label is "1"
-                    icon_path = os.path.join(os.path.dirname(__file__), "up.png")
+                    icon_path = os.path.join(os.path.dirname(__file__), "Up.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)
                     button.setIcon(icon)
 
                 if label == "Min down":  # Check if the label is "1"
-                    icon_path = os.path.join(os.path.dirname(__file__), "down.png")
+                    icon_path = os.path.join(os.path.dirname(__file__), "Down.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)
@@ -283,24 +295,36 @@ class MedicationDispenser(QMainWindow):
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_12":
-            textbox = QLabel("Medication 2 info")
-            textbox.setAlignment(Qt.AlignCenter)
-            textbox.setStyleSheet("font-size: 40px;")
+            textbox = QLabel("%s" % prescription2)
+            textbox.setAlignment(Qt.AlignLeft)
+            textbox.setStyleSheet("font-size: 40px; padding-left: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_13":
+            textbox = QLabel("%s" % prescription3)
+            textbox.setAlignment(Qt.AlignLeft)
+            textbox.setStyleSheet("font-size: 40px; padding-left: 40px;")
+            self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+
+        if screen == "screen_14":
+            textbox = QLabel("%s" % prescription4)
+            textbox.setAlignment(Qt.AlignLeft)
+            textbox.setStyleSheet("font-size: 40px; padding-left: 40px;")
+            self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+
+        if screen == "screen_15":
             textbox = QLabel("Text to speech option")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
-        if screen == "screen_14":
+        if screen == "screen_16":
             textbox = QLabel("Text to speech ON")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
-        if screen == "screen_15":
+        if screen == "screen_17":
             textbox = QLabel("Text to speech OFF")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
@@ -329,16 +353,20 @@ class MedicationDispenser(QMainWindow):
         elif screen == "screen_9":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), ("Delete","main_menu")]
         elif screen == "screen_10":
-            button_labels = [("%s"%prescription1.name, "screen_11"), (None, None), ("Med 2", "screen_12"), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
+            button_labels = [("%s"%prescription1.name, "screen_11"), ("%s"%prescription3.name, "screen_13"), ("%s"%prescription2.name, "screen_12"), ("%s"%prescription4.name, "screen_14"), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_11":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_12":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_13":
-            button_labels = [(None, None), (None, None), (None, None), (None, None), ("ON", "screen_14"), ("OFF", "screen_15"), ("Home", "main_menu"), (None,None)]
+            button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_14":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_15":
+            button_labels = [(None, None), (None, None), (None, None), (None, None), ("ON", "screen_14"), ("OFF", "screen_15"), ("Home", "main_menu"), (None,None)]
+        elif screen == "screen_16":
+            button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
+        elif screen == "screen_17":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         return button_labels
 
@@ -364,5 +392,4 @@ def main():
     window.show()
     sys.exit(app.exec())
 
-if __name__ == "__main__":
-    main()
+main()
