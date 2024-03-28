@@ -17,25 +17,47 @@ arduino_baudrate = 9600  # Make sure this matches the baud rate in your Arduino 
 arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 class MedicationInformation:
-    def __init__(self, name, dose, time, qty, expire, timemin, timehour):
+    def __init__(self, name=str('Empty'), dose=0, qty=0, expire=str(), dpd=None, ppd=None, timehour=None, timehour2=None, timemin=None, timemin2=None):
         self.name = name
         self.dose = dose
-        self.time = time
         self.qty = qty
         self.expire = expire
-        self.timemin = timemin
+        self.dpd = dpd
+        self.ppd = ppd
         self.timehour = timehour
+        self.timehour2 = timehour2
+        self.timemin = timemin
+        self.timemin2 = timemin2
+
+    def check_time(self):
+        hour = int(time.strftime("%H"))
+        min = int(time.strftime("%M"))
+        sec = int(time.strftime("%S"))
+        if hour == self.timehour and min == self.timemin and sec == 0 or hour == self.timehour2 and min == self.timemin2 and sec == 0:
+            if self.ppd == 2:
+                if self.qty > 1:
+                    print("Time to take your medication!")
+                    self.qty -= 1
+                    time.sleep(30)
+                    print("Time to take your medication!")
+                    self.qty -= 1
+                else:
+                    print("Time to take your medication!")
+                    self.qty -= 1
+                    time.sleep(1)
+            else:
+                if self.qty > 0:
+                    print("Time to take your medication!")
+                    self.qty -= 1
+                    time.sleep(1)
 
     def __str__(self):
-        return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n  Tablets Per Day:  {self.time}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}"
+        return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}"
 
-prescription1 = MedicationInformation("M1", "", "", "", "", "", "")
-prescription2 = MedicationInformation("M2", "", "", "", "", "", "")
-prescription3 = MedicationInformation("M3", "", "", "", "", "", "")
-prescription4 = MedicationInformation("M4", "", "", "", "", "", "")
-
-
-
+prescription1 = MedicationInformation()
+prescription2 = MedicationInformation()
+prescription3 = MedicationInformation()
+prescription4 = MedicationInformation()
 
 class MedicationDispenser(QMainWindow):
     def __init__(self):
@@ -45,6 +67,26 @@ class MedicationDispenser(QMainWindow):
         self.setGeometry(0, 0, 800, 480)  # Set window dimensions
         self.setupGPIO()
         self.initUI()
+
+        self.clock = QTimer()
+        self.clock.timeout.connect(self.update_time)
+        self.clock.timeout.connect(self.check_all_medications)
+        self.clock.start(100)
+
+    def update_time(self):
+        if self.current_screen == "main_menu":
+            current_time = time.localtime()
+            formatted_hour = time.strftime("%I", current_time).lstrip('0')  # Format hour and remove leading zero
+            formatted_time = formatted_hour + time.strftime(":%M %p", current_time)  # Concatenate formatted hour with the rest of the time
+            self.time_label.setText(formatted_time)
+            self.time_label.setAlignment(Qt.AlignCenter)
+
+    def check_all_medications(self):
+        # Check all instances of MedicationInformation
+        prescription1.check_time()
+        prescription2.check_time()
+        prescription3.check_time()
+        prescription4.check_time()
 
     def setupGPIO(self):
         """Configures the GPIO pins for the Raspberry Pi."""
@@ -245,6 +287,11 @@ class MedicationDispenser(QMainWindow):
                 col = 0
                 row += 1
                 
+        if screen == "main_menu":
+            self.time_label = QLabel()
+            self.time_label.setStyleSheet("font-size: 80px; font-weight: bold; padding-top: 60px;")
+            self.grid_layout.addWidget(self.time_label, 1, 0, 1, 2) 
+
         if screen == "screen_1":
             textbox = QLabel("OCR Instructions")
             textbox.setAlignment(Qt.AlignCenter)
@@ -257,7 +304,6 @@ class MedicationDispenser(QMainWindow):
             textbox.setStyleSheet("font-size: 40px; padding-left: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
             
-
         if screen == "screen_4":
             textbox = QLabel("Time 1")
             textbox.setAlignment(Qt.AlignCenter)
@@ -333,7 +379,7 @@ class MedicationDispenser(QMainWindow):
     def getButtonLabels(self, screen):
         button_labels = []
         if screen == "main_menu":
-            button_labels = [("Add Med", "screen_1"), ("Med Info", "screen_10"), (None, None), (None, None), (None, None), (None, None), ("Delete Med", "screen_7"), ("Sound", "screen_13")]
+            button_labels = [("Add Med", "screen_1"), ("Med Info", "screen_10"), (None, None), (None, None), (None, None), (None, None), ("Delete Med", "screen_7"), ("Sound", "screen_15")]
         elif screen == "screen_1":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), ("Take picture","screen_2")]
         elif screen == "screen_2":
@@ -363,7 +409,7 @@ class MedicationDispenser(QMainWindow):
         elif screen == "screen_14":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_15":
-            button_labels = [(None, None), (None, None), (None, None), (None, None), ("ON", "screen_14"), ("OFF", "screen_15"), ("Home", "main_menu"), (None,None)]
+            button_labels = [(None, None), (None, None), (None, None), (None, None), ("ON", "screen_16"), ("OFF", "screen_17"), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_16":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), (None,None)]
         elif screen == "screen_17":
