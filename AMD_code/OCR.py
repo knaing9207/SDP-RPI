@@ -11,7 +11,7 @@ def NDC(data, dosage, unit,med):
     os.chdir(r"/home/team31/project/AMD_code/ndcxls")
 
     # Import the NDC dataset
-    filename = "filtered_product.csv"
+    filename = "filtered_products.csv"
     dataset = pd.read_csv(filename)
 
     threshold = 85
