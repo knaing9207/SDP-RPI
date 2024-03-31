@@ -32,29 +32,6 @@ class MedicationInformation:
         self.timemin2 = timemin2
         self.ampm2 = ampm2
 
-    def check_time(self):
-        hour = int(time.strftime("%I"))
-        min = int(time.strftime("%M"))
-        sec = int(time.strftime("%S"))
-        ampm = str(time.strftime("%p"))
-        if hour == self.timehour and min == self.timemin and sec == 0 and ampm == self.ampm or hour == self.timehour2 and min == self.timemin2 and sec == 0 and ampm == self.ampm2:
-            if self.ppd == 2:
-                if self.qty > 1:
-                    print("Time to take your medication!")
-                    self.qty -= 1
-                    time.sleep(30)
-                    print("Time to take your medication!")
-                    self.qty -= 1
-                else:
-                    print("Time to take your medication!")
-                    self.qty -= 1
-                    time.sleep(1)
-            else:
-                if self.qty > 0:
-                    print("Time to take your medication!")
-                    self.qty -= 1
-                    time.sleep(1)
-
     def __str__(self):
         if self.timehour == None and self.timemin == None and self.ampm == None and self.timehour2 == None and self.timemin2 == None and self.ampm2 == None:
             return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}\n   "
@@ -81,7 +58,7 @@ class MedicationDispenser(QMainWindow):
 
         self.clock = QTimer()
         self.clock.timeout.connect(self.update_time)
-        self.clock.timeout.connect(self.check_all_medications)
+        self.clock.timeout.connect(self.check_med_time)
         self.clock.start(100)
 
         # Initialize previous screen and button label variables
@@ -96,12 +73,79 @@ class MedicationDispenser(QMainWindow):
             self.time_label.setText(formatted_time)
             self.time_label.setAlignment(Qt.AlignCenter)
 
-    def check_all_medications(self):
-        # Check all instances of MedicationInformation
-        self.prescription1.check_time()
-        self.prescription2.check_time()
-        self.prescription3.check_time()
-        self.prescription4.check_time()
+    def check_med_time(self):
+        hour = int(time.strftime("%I"))
+        min = int(time.strftime("%M"))
+        sec = int(time.strftime("%S"))
+        ampm = str(time.strftime("%p"))
+        if hour == self.prescription1.timehour and min == self.prescription1.timemin and sec == 0 and ampm == self.prescription1.ampm or hour == self.prescription1.timehour2 and min == self.prescription1.timemin2 and sec == 0 and ampm == self.prescription1.ampm2:
+            if self.prescription1.ppd == 2:
+                if self.prescription1.qty > 1:
+                    print("Time to take your medication!")
+                    self.prescription1.qty -= 1
+                    time.sleep(30)
+                    print("Time to take your medication!")
+                    self.prescription1.qty -= 1
+                else:
+                    print("Time to take your medication!")
+                    self.prescription1.qty -= 1
+                    time.sleep(1)
+            else:
+                if self.prescription1.qty > 0:
+                    print("Time to take your medication!")
+                    self.prescription1.qty -= 1
+                    time.sleep(1)
+        elif hour == self.prescription2.timehour and min == self.prescription2.timemin and sec == 0 and ampm == self.prescription2.ampm or hour == self.prescription2.timehour2 and min == self.prescription2.timemin2 and sec == 0 and ampm == self.prescription2.ampm2:
+            if self.prescription2.ppd == 2:
+                if self.prescription2.qty > 1:
+                    print("Time to take your medication!")
+                    self.prescription2.qty -= 1
+                    time.sleep(30)
+                    print("Time to take your medication!")
+                    self.prescription2.qty -= 1
+                else:
+                    print("Time to take your medication!")
+                    self.prescription2.qty -= 1
+                    time.sleep(1)
+            else:
+                if self.prescription2.qty > 0:
+                    print("Time to take your medication!")
+                    self.prescription2.qty -= 1
+                    time.sleep(1)
+        elif hour == self.prescription3.timehour and min == self.prescription3.timemin and sec == 0 and ampm == self.prescription3.ampm or hour == self.prescription3.timehour2 and min == self.prescription3.timemin2 and sec == 0 and ampm == self.prescription3.ampm2:
+            if self.prescription3.ppd == 2:
+                if self.prescription3.qty > 1:
+                    print("Time to take your medication!")
+                    self.prescription3.qty -= 1
+                    time.sleep(30)
+                    print("Time to take your medication!")
+                    self.prescription3.qty -= 1
+                else:
+                    print("Time to take your medication!")
+                    self.prescription3.qty -= 1
+                    time.sleep(1)
+            else:
+                if self.prescription3.qty > 0:
+                    print("Time to take your medication!")
+                    self.prescription3.qty -= 1
+                    time.sleep(1)
+        elif hour == self.prescription4.timehour and min == self.prescription4.timemin and sec == 0 and ampm == self.prescription4.ampm or hour == self.prescription4.timehour2 and min == self.prescription4.timemin2 and sec == 0 and ampm == self.prescription4.ampm2:
+            if self.prescription4.ppd == 2:
+                if self.prescription4.qty > 1:
+                    print("Time to take your medication!")
+                    self.prescription4.qty -= 1
+                    time.sleep(30)
+                    print("Time to take your medication!")
+                    self.prescription4.qty -= 1
+                else:
+                    print("Time to take your medication!")
+                    self.prescription4.qty -= 1
+                    time.sleep(1)
+            else:
+                if self.prescription4.qty > 0:
+                    print("Time to take your medication!")
+                    self.prescription4.qty -= 1
+                    time.sleep(1)
 
     def setupGPIO(self):
         """Configures the GPIO pins for the Raspberry Pi."""
@@ -357,6 +401,8 @@ class MedicationDispenser(QMainWindow):
             self.grid_layout.addWidget(textbox, 2, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_8":
+            self.addmed = None
+            self.prescriptiontemp = MedicationInformation()
             textbox = QLabel("Pour Bottle")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
