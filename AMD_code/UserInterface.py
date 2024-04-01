@@ -381,7 +381,7 @@ class MedicationDispenser(QMainWindow):
                 prescription = self.prescription3
             elif self.addmed == 4:
                 prescription = self.prescription4
-            textbox = QLabel("Time 1: %s:%s %s" % (prescription.timehour, prescription.timemin, prescription.ampm))
+            textbox = QLabel("Time 1:\n%s:%s %s" % (prescription.timehour, prescription.timemin, prescription.ampm))
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 60px; font-weight: bold;")
             self.grid_layout.addWidget(textbox, 2, 0, 1, 2)  # Span over two columns
@@ -395,7 +395,7 @@ class MedicationDispenser(QMainWindow):
                 prescription = self.prescription3
             elif self.addmed == 4:
                 prescription = self.prescription4
-            textbox = QLabel("Time 2: %s:%s %s" % (prescription.timehour2, prescription.timemin2, prescription.ampm2))
+            textbox = QLabel("Time 2:\n%s:%s %s" % (prescription.timehour2, prescription.timemin2, prescription.ampm2))
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 60px; font-weight: bold;")
             self.grid_layout.addWidget(textbox, 2, 0, 1, 2)  # Span over two columns
