@@ -7,11 +7,9 @@ from paddleocr import PaddleOCR
 from thefuzz import process
 
 def NDC(data, dosage, unit,med):
-    # Change directory
-    os.chdir(r"/home/team31/project/AMD_code/ndcxls")
 
     # Import the NDC dataset
-    filename = "filtered_products.csv"
+    filename = "/home/team31/project/AMD_code/ndcxls/filtered_products.csv"
     dataset = pd.read_csv(filename)
 
     threshold = 85
@@ -104,7 +102,7 @@ def imageocr(prescription):
     GPIO.output(LEDs, GPIO.LOW)
     GPIO.cleanup(LEDs)
     ocr_model = PaddleOCR(use_angle_cls=True, lang='en') # Initialize OCR model
-    img_path = 'AMD_code/image.jpg'  # Path to the image file
+    img_path = '/home/team31/project/AMD_code/image.jpg'  # Path to the image file
     result = ocr_model.ocr(img_path, cls=True) # Perform OCR on the image
 
     text = []

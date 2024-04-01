@@ -27,14 +27,26 @@ void loop() {
   
     if (Serial.available() > 0) {
       
-        char command = Serial.read();
+        String receivedString = Serial.readStringUntil('\n');  // Read the string until newline character
         
-        if (command == '1') {
+        if (receivedString == "Dispense 1") {
           // Dispense
           dispenseAndDetect(servo1, angle1, state1, photoPin1);
-          
+          Serial.println("Done 1");
         }
-        else if (command == '2') {
+        else if (receivedString == "Dispense 2") {
+          // Dispense
+          //dispenseAndDetect(servo2, angle2, state2, photoPin2);
+        }
+        else if (receivedString == "Dispense 3") {
+          // Dispense
+          //dispenseAndDetect(servo3, angle3, state3, photoPin3);
+        }
+        else if (receivedString == "Dispense 4") {
+          // Dispense
+          //dispenseAndDetect(servo4, angle4, state4, photoPin4);
+        }
+        else if (receivedString == "Pic 1") {
             
           // Rotate slowly to the ending position
           for (int angle = 90; angle >= 70; angle=angle-5) {
@@ -42,7 +54,7 @@ void loop() {
             delay(100);
           }
         }
-        else if (command == '3') {
+        else if (receivedString == "Pic 2") {
             
           // Rotate slowly to the ending position
           for (int angle = 70; angle >= 50; angle=angle-5) {
@@ -50,7 +62,7 @@ void loop() {
             delay(100);
           }
         }
-        else if (command == '4') {
+        else if (receivedString == "Pic 3") {
             
           // Rotate slowly to the ending position
           for (int angle = 50; angle >= 30; angle=angle-5) {
@@ -59,7 +71,7 @@ void loop() {
           }
           
         }
-        else if (command == '5') {
+        else if (receivedString == "Pic 4") {
             
           // Rotate slowly back to the starting position
           for (int angle = 30; angle <= 110; angle=angle+5) {
@@ -67,7 +79,7 @@ void loop() {
             delay(100);
           }
         }
-        else if (command == '6') {
+        else if (receivedString == "Pic 5") {
             
           // Rotate slowly back to the starting position
           for (int angle = 110; angle <= 130; angle=angle+5) {
@@ -75,7 +87,7 @@ void loop() {
             delay(100);
           }
         }
-        else if (command == '7') {
+        else if (receivedString == "Pic 6") {
             
           // Rotate slowly back to the starting position
           for (int angle = 130; angle <= 150; angle=angle+5) {
@@ -83,7 +95,7 @@ void loop() {
             delay(100);
           }
         }
-        else if (command == '8') {
+        else if (receivedString == "Pic 7") {
             
            // Rotate slowly back to the starting position
           for (int angle = 150; angle >= 90; angle=angle-5) {
