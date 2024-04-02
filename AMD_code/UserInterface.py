@@ -97,7 +97,7 @@ class MedicationDispenser(QMainWindow):
 
     def load_prescriptions(self):
         try:
-            with open("prescriptions.txt", "r") as file:
+            with open("/home/team31/project/prescriptions.txt", "r") as file:
                 data = file.read()
                 prescriptions_data = eval(data)
                 self.prescription1 = MedicationInformation.from_dict(prescriptions_data['prescription1'])
@@ -111,7 +111,7 @@ class MedicationDispenser(QMainWindow):
 
     def save_prescriptions(self):
         try:
-            with open("prescriptions.txt", "w") as file:
+            with open("/home/team31/project/prescriptions.txt", "w") as file:
                 data = {
                     'prescription1': self.prescription1.to_dict(),
                     'prescription2': self.prescription2.to_dict(),
@@ -480,6 +480,30 @@ class MedicationDispenser(QMainWindow):
 
                 if label == "Add Med":  # Check if the label is "1"
                     icon_path = os.path.join(os.path.dirname(__file__), "Plus.png")
+                    pixmap = QPixmap(icon_path)
+                    pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
+                    icon = QIcon(pixmap_resized)
+                    button.setIcon(icon)
+                    button.setIconSize(pixmap_resized.size())  # Set icon size to match pixmap size
+
+                if label == "Med Info":  # Check if the label is "1"
+                    icon_path = os.path.join(os.path.dirname(__file__), "Bottle.png")
+                    pixmap = QPixmap(icon_path)
+                    pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
+                    icon = QIcon(pixmap_resized)
+                    button.setIcon(icon)
+                    button.setIconSize(pixmap_resized.size())  # Set icon size to match pixmap size
+
+                if label == "Delete Med":  # Check if the label is "1"
+                    icon_path = os.path.join(os.path.dirname(__file__), "Minus.png")
+                    pixmap = QPixmap(icon_path)
+                    pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
+                    icon = QIcon(pixmap_resized)
+                    button.setIcon(icon)
+                    button.setIconSize(pixmap_resized.size())  # Set icon size to match pixmap size
+
+                if label == "Sound":  # Check if the label is "1"
+                    icon_path = os.path.join(os.path.dirname(__file__), "Speaker.png")
                     pixmap = QPixmap(icon_path)
                     pixmap_resized = pixmap.scaled(25, 25)  # Resize the icon
                     icon = QIcon(pixmap_resized)

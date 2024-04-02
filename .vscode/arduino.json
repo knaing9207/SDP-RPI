@@ -2,5 +2,5 @@
     "board": "arduino:avr:uno",
     "port": "/dev/ttyACM0",
     "sketch": "AMD_code/Arduino/AMD/AMD.ino",
-    "programmer": "avrispmkii"
+    "programmer": "avrisp"
 }
