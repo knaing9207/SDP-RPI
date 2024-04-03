@@ -4,6 +4,7 @@ import time
 import copy
 import serial
 import RPi.GPIO as GPIO
+import pyvolume
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QGridLayout, QLabel
 from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtCore import Qt,QTimer
@@ -154,6 +155,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 1\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 1")
@@ -163,6 +165,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
             else:
                 if self.prescription1.qty > 0:
                     send_to_arduino("Dispense 1\n")  # Send a string to the Arduino
@@ -173,6 +176,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
         elif hour == self.prescription2.timehour and min == self.prescription2.timemin and sec == 0 and ampm == self.prescription2.ampm or hour == self.prescription2.timehour2 and min == self.prescription2.timemin2 and sec == 0 and ampm == self.prescription2.ampm2:
             if self.prescription2.ppd == 2:
                 if self.prescription2.qty > 1:
@@ -192,6 +196,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 2\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 2")
@@ -201,6 +206,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
             else:
                 if self.prescription2.qty > 0:
                     send_to_arduino("Dispense 2\n")  # Send a string to the Arduino
@@ -211,6 +217,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
         elif hour == self.prescription3.timehour and min == self.prescription3.timemin and sec == 0 and ampm == self.prescription3.ampm or hour == self.prescription3.timehour2 and min == self.prescription3.timemin2 and sec == 0 and ampm == self.prescription3.ampm2:
             if self.prescription3.ppd == 2:
                 if self.prescription3.qty > 1:
@@ -230,6 +237,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 3\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 3")
@@ -239,6 +247,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
             else:
                 if self.prescription3.qty > 0:
                     send_to_arduino("Dispense 3\n")  # Send a string to the Arduino
@@ -249,6 +258,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
         elif hour == self.prescription4.timehour and min == self.prescription4.timemin and sec == 0 and ampm == self.prescription4.ampm or hour == self.prescription4.timehour2 and min == self.prescription4.timemin2 and sec == 0 and ampm == self.prescription4.ampm2:
             if self.prescription4.ppd == 2:
                 if self.prescription4.qty > 1:
@@ -268,6 +278,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 4")
@@ -277,6 +288,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
             else:
                 if self.prescription4.qty > 0:
                     send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
@@ -287,6 +299,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
+                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
 
     def delete_med(self, prescription):
         for _ in range(prescription.qty):
@@ -646,13 +659,15 @@ class MedicationDispenser(QMainWindow):
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_15":
-            textbox = QLabel("Text to speech ON")
+            pyvolume.custom(percent=100)
+            textbox = QLabel("System Sound ON")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_16":
-            textbox = QLabel("Text to speech OFF")
+            pyvolume.custom(percent=0)
+            textbox = QLabel("System Sound OFF")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
