@@ -6,7 +6,7 @@ import pandas as pd
 from paddleocr import PaddleOCR
 from thefuzz import process
 
-def NDC(data, dosage, unit,med):
+def NDC(data, dosage, unit, med):
 
     # Import the NDC dataset
     filename = "/home/team31/project/AMD_code/ndcxls/filtered_products.csv"
@@ -28,19 +28,8 @@ def NDC(data, dosage, unit,med):
                     med.name = result
 
                     return
-    
-def process_MGNDC(strings):
-    for string in strings:
-        if 'MG' in string:
-            matches = re.findall(r'(\d+)[0oO]*MG', string)
-            if matches:
-                number_before_MG = matches[0]
-                zeros_count = string[string.find(number_before_MG) + len(number_before_MG): string.find("MG")].count("0") + string[string.find(number_before_MG) + len(number_before_MG): string.find("MG")].count("o") + string[string.find(number_before_MG) + len(number_before_MG): string.find("MG")].count("O")
-                result = number_before_MG + "0" * zeros_count
-        
-                return result
 
-def process_MG(strings,med):
+def process_MG(strings, med):
     for string in strings:
         if 'MG' in string:
             matches = re.findall(r'(\d+)[0oO]*MG', string)
@@ -50,20 +39,9 @@ def process_MG(strings,med):
                 result = number_before_MG + "0" * zeros_count 
                 med.dose = result
                 
-                return
+                return result
             
-def process_TABLET(strings,med):
-    for string in strings:
-        if 'TABLET' in string:
-            matches = re.findall(r'(\d+)\s*TABLET', string)
-            if matches:
-                number_before_TABLET = matches[0]
-                result = number_before_TABLET 
-                med.time = result
-                
-                return
-
-def process_QTY(strings,med):
+def process_QTY(strings, med):
     for string in strings:
         if 'QTY' in string:
             matches_with_space = re.findall(r'[QO0o]TY\s*[:;]?\s*(\d+)\s*([oO0]*)', string)
@@ -86,6 +64,11 @@ def shortndc(input_array):
         else:
             new_array.append(item)  # Adding items without spaces directly to the new array
     return new_array
+
+def find_string_position (list, string):
+    postion = list.index(string)
+    return postion
+
 
 def imageocr(prescription):
     GPIO.setmode(GPIO.BCM)
@@ -118,7 +101,9 @@ def imageocr(prescription):
 
 
     # Process the data using process_MG
-    process_MG(data,prescription) 
-    process_TABLET(data,prescription) 
-    process_QTY(data,prescription)
-    NDC(shortndc(data), process_MGNDC(data), 'MG',prescription) 
+    dose = process_MG(data, prescription)
+    process_QTY(data, prescription)
+    shortarray = shortndc(data)
+    position = find_string_position(shortarray, "%sMG" % dose or "%s" % dose)
+    namearray = shortarray[position-2:position]
+    NDC(namearray, dose, 'MG', prescription)

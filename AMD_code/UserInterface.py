@@ -3,6 +3,7 @@ import sys
 import time
 import copy
 import serial
+import threading
 import RPi.GPIO as GPIO
 import pyvolume
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QWidget, QGridLayout, QLabel
@@ -27,11 +28,10 @@ def read_from_arduino():
     return arduino.readline().decode().strip()  # Read line and decode from bytes
 
 class MedicationInformation:
-    def __init__(self, name=str('Empty'), dose=0, qty=0, expire=str(), dpd=None, ppd=None, timehour=None, timemin=None, ampm=None, timehour2=None, timemin2=None, ampm2=None):
+    def __init__(self, name=str('Empty'), dose=0, qty=0, dpd=None, ppd=None, timehour=None, timemin=None, ampm=None, timehour2=None, timemin2=None, ampm2=None):
         self.name = name
         self.dose = dose
         self.qty = qty
-        self.expire = expire
         self.dpd = dpd
         self.ppd = ppd
         self.timehour = timehour
@@ -43,18 +43,17 @@ class MedicationInformation:
 
     def __str__(self):
         if self.timehour == None and self.timemin == None and self.ampm == None and self.timehour2 == None and self.timemin2 == None and self.ampm2 == None:
-            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}\n   "
+            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n"
         elif self.timehour2 == None and self.timemin2 == None and self.ampm2 == None:
-            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}\n   Time 1: {self.timehour}:{self.timemin} {self.ampm}"
+            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Time 1: {self.timehour}:{self.timemin} {self.ampm}"
         else:
-            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Expiration Date:  {self.expire}\n   Time 1: {self.timehour}:{self.timemin} {self.ampm}\n Time 2: {self.timehour2}:{self.timemin2} {self.ampm2}"
+            return f"Medication Name:  {self.name}\n             Dosage:  {self.dose}\n            Quantity:  {self.qty}\n   Time 1: {self.timehour}:{self.timemin} {self.ampm}\n Time 2: {self.timehour2}:{self.timemin2} {self.ampm2}"
 
     def to_dict(self):
         return {
             'name': self.name,
             'dose': self.dose,
             'qty': self.qty,
-            'expire': self.expire,
             'dpd': self.dpd,
             'ppd': self.ppd,
             'timehour': self.timehour,
@@ -84,6 +83,7 @@ class MedicationDispenser(QMainWindow):
 
         self.setWindowTitle("Medication Dispenser")
         self.setGeometry(0, 0, 800, 480)  # Set window dimensions
+        self.setFixedSize(800, 480)
         self.setupGPIO()
         self.initUI()
 
@@ -155,7 +155,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 1\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 1")
@@ -165,7 +165,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
             else:
                 if self.prescription1.qty > 0:
                     send_to_arduino("Dispense 1\n")  # Send a string to the Arduino
@@ -176,7 +176,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
         elif hour == self.prescription2.timehour and min == self.prescription2.timemin and sec == 0 and ampm == self.prescription2.ampm or hour == self.prescription2.timehour2 and min == self.prescription2.timemin2 and sec == 0 and ampm == self.prescription2.ampm2:
             if self.prescription2.ppd == 2:
                 if self.prescription2.qty > 1:
@@ -196,7 +196,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 2\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 2")
@@ -206,7 +206,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
             else:
                 if self.prescription2.qty > 0:
                     send_to_arduino("Dispense 2\n")  # Send a string to the Arduino
@@ -217,7 +217,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
         elif hour == self.prescription3.timehour and min == self.prescription3.timemin and sec == 0 and ampm == self.prescription3.ampm or hour == self.prescription3.timehour2 and min == self.prescription3.timemin2 and sec == 0 and ampm == self.prescription3.ampm2:
             if self.prescription3.ppd == 2:
                 if self.prescription3.qty > 1:
@@ -237,7 +237,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 3\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 3")
@@ -247,7 +247,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
             else:
                 if self.prescription3.qty > 0:
                     send_to_arduino("Dispense 3\n")  # Send a string to the Arduino
@@ -258,7 +258,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
         elif hour == self.prescription4.timehour and min == self.prescription4.timemin and sec == 0 and ampm == self.prescription4.ampm or hour == self.prescription4.timehour2 and min == self.prescription4.timemin2 and sec == 0 and ampm == self.prescription4.ampm2:
             if self.prescription4.ppd == 2:
                 if self.prescription4.qty > 1:
@@ -278,7 +278,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
                 else:
                     send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
                     print("Dispensing Prescription 4")
@@ -288,7 +288,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
             else:
                 if self.prescription4.qty > 0:
                     send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
@@ -299,7 +299,7 @@ class MedicationDispenser(QMainWindow):
                         time.sleep(0.1)
                     self.prescription1.qty -= 1
                     time.sleep(0.5)
-                    os.system("mpg321 " "/home/team31/project/AMD_code/Ready.mp3")
+                    os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Ready.mp3")
 
     def delete_med(self, prescription):
         for _ in range(prescription.qty):
@@ -311,17 +311,17 @@ class MedicationDispenser(QMainWindow):
                     response = read_from_arduino()  # Read the response from the Arduino
                     time.sleep(0.1)
             elif prescription == self.prescription2:
-                send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
-                print("Dispensing Prescription 4")
+                send_to_arduino("Dispense 2\n")  # Send a string to the Arduino
+                print("Dispensing Prescription 2")
                 response = str()
-                while response != "Done 4":
+                while response != "Done 2":
                     response = read_from_arduino()  # Read the response from the Arduino
                     time.sleep(0.1)
             elif prescription == self.prescription3:
-                send_to_arduino("Dispense 4\n")  # Send a string to the Arduino
-                print("Dispensing Prescription 4")
+                send_to_arduino("Dispense 3\n")  # Send a string to the Arduino
+                print("Dispensing Prescription 3")
                 response = str()
-                while response != "Done 4":
+                while response != "Done 3":
                     response = read_from_arduino()  # Read the response from the Arduino
                     time.sleep(0.1)
             elif prescription == self.prescription4:
@@ -523,7 +523,7 @@ class MedicationDispenser(QMainWindow):
                     button.setIcon(icon)
                     button.setIconSize(pixmap_resized.size())  # Set icon size to match pixmap size
 
-                if label == "Take picture":  # Check if the label is "1"
+                if label == "Take Picture":  # Check if the label is "1"
                     button.clicked.connect(self.ocr_function)  # Connect button click to function
                     
                 if label == "Hour Up":  # Check if the label is "1"
@@ -563,16 +563,21 @@ class MedicationDispenser(QMainWindow):
                 
         if screen == "main_menu":
             self.save_prescriptions()
+            self.addmed = None
             self.time_label = QLabel()
             self.time_label.setStyleSheet("font-size: 80px; font-weight: bold; padding-top: 60px;")
             self.grid_layout.addWidget(self.time_label, 1, 0, 1, 2) 
 
         if screen == "screen_1":
-            textbox = QLabel("OCR Instructions")
+            textbox = QLabel("Prescription Bottle Photo:\nOpen the front door and place your\nprescription bottle on the circle stand.\nMake sure the med name faces the camera.\nClose the door then press Take Picture")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
-            self.grid_layout.addWidget(textbox, 1, 0, 1, 2) 
-                           
+            self.grid_layout.addWidget(textbox, 1, 0, 1, 2)
+            
+            # Start a new thread to play audio using a lambda function
+            audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Photo.mp3"))
+            audio_thread.start()
+
         if screen == "screen_2":
             textbox = QLabel("%s" % self.prescriptiontemp)
             textbox.setAlignment(Qt.AlignLeft)
@@ -580,16 +585,24 @@ class MedicationDispenser(QMainWindow):
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_4":
-            textbox = QLabel("Doses Per Day")
+            textbox = QLabel("Dose(s) Per Day:\nEnter how many dose(s) you\nhave to take per day")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 60px; font-weight: bold; padding-top: 60px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+
+            # Start a new thread to play audio using a lambda function
+            audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/DPD.mp3"))
+            audio_thread.start()
         
         if screen == "screen_5":
-            textbox = QLabel("Pills Per Day")
+            textbox = QLabel("Pill(s) Per Dose:\nEnter how many pill(s) you\nhave to take per dose")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 60px; font-weight: bold; padding-top: 60px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+
+            # Start a new thread to play audio using a lambda function
+            audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/PPD.mp3"))
+            audio_thread.start()
             
         if screen == "screen_6":
             if self.addmed == 1:
@@ -602,7 +615,7 @@ class MedicationDispenser(QMainWindow):
                 prescription = self.prescription4
             textbox = QLabel("Time 1:\n%s:%s %s" % (prescription.timehour, prescription.timemin, prescription.ampm))
             textbox.setAlignment(Qt.AlignCenter)
-            textbox.setStyleSheet("font-size: 60px; font-weight: bold;")
+            textbox.setStyleSheet("font-size: 40px; font-weight: bold;")
             self.grid_layout.addWidget(textbox, 2, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_7":
@@ -616,17 +629,32 @@ class MedicationDispenser(QMainWindow):
                 prescription = self.prescription4
             textbox = QLabel("Time 2:\n%s:%s %s" % (prescription.timehour2, prescription.timemin2, prescription.ampm2))
             textbox.setAlignment(Qt.AlignCenter)
-            textbox.setStyleSheet("font-size: 60px; font-weight: bold;")
+            textbox.setStyleSheet("font-size: 40px; font-weight: bold;")
             self.grid_layout.addWidget(textbox, 2, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_8":
-            self.addmed = None
             self.prescriptiontemp = MedicationInformation()
             self.save_prescriptions()
-            textbox = QLabel("Pour Bottle")
+            textbox = QLabel("Pour Bottle Into\nDispenser %s" % self.addmed)
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+            if self.addmed == 1:
+                # Start a new thread to play audio using a lambda function
+                audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Pour_1.mp3"))
+                audio_thread.start()
+            elif self.addmed == 2:
+                # Start a new thread to play audio using a lambda function
+                audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Pour_2.mp3"))
+                audio_thread.start()
+            elif self.addmed == 3:
+                # Start a new thread to play audio using a lambda function
+                audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Pour_3.mp3"))
+                audio_thread.start()
+            elif self.addmed == 4:
+                # Start a new thread to play audio using a lambda function
+                audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Pour_4.mp3"))
+                audio_thread.start()
 
         if screen == "screen_10":
             textbox = QLabel("%s" % self.prescription1)
@@ -653,17 +681,21 @@ class MedicationDispenser(QMainWindow):
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_14":
-            textbox = QLabel("Text to speech option")
+            textbox = QLabel("System Sound Option")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
 
         if screen == "screen_15":
-            pyvolume.custom(percent=100)
+            pyvolume.custom(percent=40)
             textbox = QLabel("System Sound ON")
             textbox.setAlignment(Qt.AlignCenter)
             textbox.setStyleSheet("font-size: 40px;")
             self.grid_layout.addWidget(textbox, 1, 0, 1, 2)  # Span over two columns
+
+            # Start a new thread to play audio using a lambda function
+            audio_thread = threading.Thread(target=lambda: os.system("mpg321 " "/home/team31/project/AMD_code/TTS/Sound_On.mp3"))
+            audio_thread.start()
 
         if screen == "screen_16":
             pyvolume.custom(percent=0)
@@ -687,7 +719,7 @@ class MedicationDispenser(QMainWindow):
         if screen == "main_menu":
             button_labels = [("Add Med", "screen_1"), ("Med Info", "screen_9"), (None, None), (None, None), (None, None), (None, None), ("Delete Med", "screen_17"), ("Sound", "screen_14")]
         elif screen == "screen_1":
-            button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), ("Take picture","screen_2")]
+            button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Home", "main_menu"), ("Take Picture","screen_2")]
         elif screen == "screen_2":
             button_labels = [(None, None), (None, None), (None, None), (None, None), (None, None), (None, None), ("Retake", "screen_1"), ("Confirm","screen_3")] 
         elif screen == "screen_3":
@@ -854,44 +886,44 @@ class MedicationDispenser(QMainWindow):
                     pass
         elif self.previous_screen == 'screen_6' and self.previous_button_label == 'Min Up' and self.current_screen == 'screen_6':
             if self.addmed == 1:
-                if self.prescription1.timemin < 45:
-                    self.prescription1.timemin += 15
+                if self.prescription1.timemin < 60:
+                    self.prescription1.timemin += 1
                 else:
                     pass
             elif self.addmed == 2:
-                if self.prescription2.timemin < 45:
-                    self.prescription2.timemin += 15
+                if self.prescription2.timemin < 60:
+                    self.prescription2.timemin += 1
                 else:
                     pass
             elif self.addmed == 3:
-                if self.prescription3.timemin < 45:
-                    self.prescription3.timemin += 15
+                if self.prescription3.timemin < 60:
+                    self.prescription3.timemin += 1
                 else:
                     pass
             elif self.addmed == 4:
-                if self.prescription4.timemin < 45:
-                    self.prescription4.timemin += 15
+                if self.prescription4.timemin < 60:
+                    self.prescription4.timemin += 1
                 else:
                     pass
         elif self.previous_screen == 'screen_6' and self.previous_button_label == 'Min Down' and self.current_screen == 'screen_6':
             if self.addmed == 1:
                 if self.prescription1.timemin > 0:
-                    self.prescription1.timemin -= 15
+                    self.prescription1.timemin -= 1
                 else:
                     pass
             elif self.addmed == 2:
                 if self.prescription2.timemin > 0:
-                    self.prescription2.timemin -= 15
+                    self.prescription2.timemin -= 1
                 else:
                     pass
             elif self.addmed == 3:
                 if self.prescription3.timemin > 0:
-                    self.prescription3.timemin -= 15
+                    self.prescription3.timemin -= 1
                 else:
                     pass
             elif self.addmed == 4:
                 if self.prescription4.timemin > 0:
-                    self.prescription4.timemin -= 15
+                    self.prescription4.timemin -= 1
                 else:
                     pass
         elif self.previous_screen == 'screen_6' and self.previous_button_label == 'AM/PM' and self.current_screen == 'screen_6':
@@ -968,44 +1000,44 @@ class MedicationDispenser(QMainWindow):
                     pass
         elif self.previous_screen == 'screen_7' and self.previous_button_label == 'Min Up' and self.current_screen == 'screen_7':
             if self.addmed == 1:
-                if self.prescription1.timemin2 < 45:
-                    self.prescription1.timemin2 += 15
+                if self.prescription1.timemin2 < 60:
+                    self.prescription1.timemin2 += 1
                 else:
                     pass
             elif self.addmed == 2:
-                if self.prescription2.timemin2 < 45:
-                    self.prescription2.timemin2 += 15
+                if self.prescription2.timemin2 < 60:
+                    self.prescription2.timemin2 += 1
                 else:
                     pass
             elif self.addmed == 3:
-                if self.prescription3.timemin2 < 45:
-                    self.prescription3.timemin2 += 15
+                if self.prescription3.timemin2 < 60:
+                    self.prescription3.timemin2 += 1
                 else:
                     pass
             elif self.addmed == 4:
-                if self.prescription4.timemin2 < 45:
-                    self.prescription4.timemin2 += 15
+                if self.prescription4.timemin2 < 60:
+                    self.prescription4.timemin2 += 1
                 else:
                     pass
         elif self.previous_screen == 'screen_7' and self.previous_button_label == 'Min Down' and self.current_screen == 'screen_7':
             if self.addmed == 1:
                 if self.prescription1.timemin2 > 0:
-                    self.prescription1.timemin2 -= 15
+                    self.prescription1.timemin2 -= 1
                 else:
                     pass
             elif self.addmed == 2:
                 if self.prescription2.timemin2 > 0:
-                    self.prescription2.timemin2 -= 15
+                    self.prescription2.timemin2 -= 1
                 else:
                     pass
             elif self.addmed == 3:
                 if self.prescription3.timemin2 > 0:
-                    self.prescription3.timemin2 -= 15
+                    self.prescription3.timemin2 -= 1
                 else:
                     pass
             elif self.addmed == 4:
                 if self.prescription4.timemin2 > 0:
-                    self.prescription4.timemin2 -= 15
+                    self.prescription4.timemin2 -= 1
                 else:
                     pass
         elif self.previous_screen == 'screen_7' and self.previous_button_label == 'AM/PM' and self.current_screen == 'screen_7':
