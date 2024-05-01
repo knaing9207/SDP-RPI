@@ -2,9 +2,25 @@ import re
 import os
 import RPi.GPIO as GPIO
 import time
+import serial
 import pandas as pd
 from paddleocr import PaddleOCR
 from thefuzz import process
+
+# Define the serial port
+arduino_port = '/dev/ttyACM0'  # Change this to match your Arduino port
+arduino_baudrate = 9600  # Make sure this matches the baud rate in your Arduino code
+
+# Initialize serial communication with the Arduino
+arduino = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
+
+# Function to send a string to the Arduino
+def send_to_arduino(string):
+    arduino.write(string.encode())  # Convert string to bytes and send
+
+# Function to read a string from the Arduino
+def read_from_arduino():
+    return arduino.readline().decode().strip()  # Read line and decode from bytes
 
 def NDC(data, dosage, unit, med):
 
@@ -74,18 +90,41 @@ def imageocr(prescription):
     GPIO.setmode(GPIO.BCM)
     LEDs = 25
     GPIO.setup(LEDs, GPIO.OUT)
-
     GPIO.output(LEDs, GPIO.HIGH)
-    time.sleep(2)
-    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMD_code/image.jpg'
 
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image4.jpg'
     os.system(fswebcam)
+    send_to_arduino("Pic 1\n")  # Send a string to the Arduino
+    time.sleep(1)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image5.jpg'
+    os.system(fswebcam)
+    send_to_arduino("Pic 2\n")  # Send a string to the Arduino
+    time.sleep(1)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image6.jpg'
+    os.system(fswebcam)
+    send_to_arduino("Pic 3\n")  # Send a string to the Arduino
+    time.sleep(1)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image7.jpg'
+    os.system(fswebcam)
+    send_to_arduino("Pic 4\n")  # Send a string to the Arduino
+    time.sleep(3)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image3.jpg'
+    os.system(fswebcam)
+    send_to_arduino("Pic 5\n")  # Send a string to the Arduino
+    time.sleep(1)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image2.jpg'
+    os.system(fswebcam)
+    send_to_arduino("Pic 6\n")  # Send a string to the Arduino
+    time.sleep(1)
+    fswebcam = 'fswebcam --resolution 1920x1080 --set "Focus, Automatic Continuous"=False --set "Focus, Absolute"=300 --crop 1000x1080+460+0 --save /home/team31/project/AMDimages/image1.jpg'
+    os.system(fswebcam)
+    time.sleep(0.5)
+    send_to_arduino("Pic 7\n")  # Send a string to the Arduino
     
-    time.sleep(5)
     GPIO.output(LEDs, GPIO.LOW)
     GPIO.cleanup(LEDs)
     ocr_model = PaddleOCR(use_angle_cls=True, lang='en') # Initialize OCR model
-    img_path = '/home/team31/project/AMD_code/image.jpg'  # Path to the image file
+    img_path = '/home/team31/project/AMDimages/image4.jpg'  # Path to the image file
     result = ocr_model.ocr(img_path, cls=True) # Perform OCR on the image
 
     text = []

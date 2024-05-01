@@ -128,7 +128,8 @@ class MedicationDispenser(QMainWindow):
             current_time = time.localtime()
             formatted_hour = time.strftime("%I", current_time).lstrip('0')  # Format hour and remove leading zero
             formatted_time = formatted_hour + time.strftime(":%M %p", current_time)  # Concatenate formatted hour with the rest of the time
-            self.time_label.setText(formatted_time)
+            formatted_date = time.strftime("%a, %b %d %y", current_time)  # Format date
+            self.time_label.setText(formatted_date + "\n" + formatted_time)
             self.time_label.setAlignment(Qt.AlignCenter)
 
     def check_med_time(self):
@@ -565,7 +566,7 @@ class MedicationDispenser(QMainWindow):
             self.save_prescriptions()
             self.addmed = None
             self.time_label = QLabel()
-            self.time_label.setStyleSheet("font-size: 80px; font-weight: bold; padding-top: 60px;")
+            self.time_label.setStyleSheet("font-size: 60px; font-weight: bold; padding-top: 25px;")
             self.grid_layout.addWidget(self.time_label, 1, 0, 1, 2) 
 
         if screen == "screen_1":
